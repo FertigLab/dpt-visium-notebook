@@ -6,6 +6,6 @@ RUN apt-get update -y && \
     pip install leidenalg
 
 RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr"), ask=FALSE) ;\
-                install.packages("ggrepel")'
+                install.packages(c("ggrepel","ggpubr"))'
 
 
