@@ -5,6 +5,11 @@ date: "2024-12-04"
 output:
   html_document: default
   pdf_document: default
+params:
+  spaceranger_dir: "~/OneDrive/BTC_DPTpilot1_spaceranger/BTC13"
+  coda_ann_path: "~/OneDrive/CODA/H13/tissue_positions_cellular_compositions.csv"
+  output_dir: "analysis_pilot"
+  sample_name: "BTC13"
 ---
 
 # VISIUM DATA ANALYSIS WITH SEURAT
@@ -34,7 +39,7 @@ options(future.globals.maxSize = 1024 * 1024 * 1024)  # 1 GB
 
 ## Loading the data for sample BTC13
 ```{r}
-BTC13 <- Load10X_Spatial("BTC13/")
+BTC13 <- Load10X_Spatial(spaceranger_dir)
 dim(BTC13)
 head(BTC13@meta.data)
 ```
@@ -45,7 +50,7 @@ head(BTC13@meta.data)
 BTC13metadata <- BTC13@meta.data
 
 # uploading CODA annotations
-codaBTC13 <- as.data.frame(read.csv("tissue_positions_cellular_compositions.csv"))
+codaBTC13 <- as.data.frame(read.csv(coda_ann_path))
 rownames(codaBTC13) <- codaBTC13$X
 codaBTC13 <- codaBTC13[, -c(1, 2, 3, 4, 5, 6)]
 head(codaBTC13)
