@@ -4,8 +4,8 @@ RUN apt-get update -y && \
     apt-get upgrade -y && \
     apt-get install libcurl4-openssl-dev libblas-dev \
             liblapack-dev gfortran pandoc libnlopt-dev \
-            cmake -y && \
-    pip install leidenalg
+            cmake pip3 -y && \
+    pip3 install leidenalg
 
 RUN Rscript -e 'install.packages(c("BiocManager", "Seurat", "ggrepel", "ggpubr"), \
                     dependencies=TRUE, repos="https://cloud.r-project.org")'
