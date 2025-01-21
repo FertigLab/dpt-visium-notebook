@@ -19,7 +19,9 @@ process RENDER_RMD {
     par <- list(spaceranger_dir="${data}",coda_ann_path="${coda}")
     outfile <- "${prefix}/${nb_file}.html"
     rmarkdown::render("${notebook}", output_file=outfile, params=par)
-    versions <- lapply(qq[["otherPkgs"]], function(x) {sprintf("%s:%s\n", x[["Package"]], x[["Version"]])})
-    cat(unlist(versions), file="versions.yml")'
+    sinfo <- sessionInfo()
+    versions <- lapply(sinfo[["otherPkgs"]], function(x) {sprintf("  %s:%s",x[["Package"]],x[["Version"]])})
+    cat("${task.process}",":\n", file="versions.yml", sep="")
+    cat(unlist(versions), file="versions.yml", append=TRUE, sep="\n")'
     """
 }
