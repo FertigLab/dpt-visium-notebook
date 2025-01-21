@@ -30,6 +30,7 @@ library(fgsea)
 library(msigdbr)
 library(RColorBrewer)
 library(ggpubr)
+library(MAST)
 ```
 
 ## Increasing the allowed memory to avoid errors regarding lack of memory
@@ -39,7 +40,7 @@ options(future.globals.maxSize = 1024 * 1024 * 1024)  # 1 GB
 
 ## Loading the data for sample BTC13
 ```{r}
-BTC13 <- Load10X_Spatial(spaceranger_dir)
+BTC13 <- Load10X_Spatial(params$spaceranger_dir)
 dim(BTC13)
 head(BTC13@meta.data)
 ```
@@ -50,7 +51,7 @@ head(BTC13@meta.data)
 BTC13metadata <- BTC13@meta.data
 
 # uploading CODA annotations
-codaBTC13 <- as.data.frame(read.csv(coda_ann_path))
+codaBTC13 <- as.data.frame(read.csv(params$coda_ann_path))
 rownames(codaBTC13) <- codaBTC13$X
 codaBTC13 <- codaBTC13[, -c(1, 2, 3, 4, 5, 6)]
 head(codaBTC13)
@@ -377,9 +378,6 @@ load("BTC13_Epithelial.Rda")
 hallmark_pathways = msigdbr(species = "Homo sapiens", category = "H")
 hallmark_list <- split(hallmark_pathways$gene_symbol, hallmark_pathways$gs_name)
 
-# directory to save the plots
-output_dir <- "Analysis_pilot/BTC13/"
-dir.create(output_dir, showWarnings = FALSE)
 
 # loop for calculating module scores
 for (pathway in names(hallmark_list)) {
@@ -395,12 +393,12 @@ for (pathway in names(hallmark_list)) {
     print(plot)
   
   # Save the plot
-    ggsave(filename = file.path(output_dir, paste0(pathway, "_feature_plot.png")), plot = p, width = 8, height = 6)
+    ggsave(filename = file.path(paste0(pathway, "_feature_plot.png")), plot = plot, width = 8, height = 6)
 }
 
 head(BTC13epit@meta.data)
 
-save(BTC13epit, file = 'Analysis_pilot/BTC13epit_modscores.Rda')
+save(BTC13epit, file = 'BTC13epit_modscores.Rda')
 ```
 
 ### module scores violin plots
@@ -425,7 +423,7 @@ for (pathway in names(hallmark_list)) {
       ggtitle(pathway)
     
     # Save the plot
-    ggsave(filename = file.path(output_dir, paste0(pathway, "_violin_plot.png")), plot = p, width = 8, height = 6)
+    ggsave(filename = file.path(paste0(pathway, "_violin_plot.png")), plot = p, width = 8, height = 6)
     
     print(p)
   
