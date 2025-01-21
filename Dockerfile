@@ -9,7 +9,7 @@ RUN apt install -y python3-leidenalg python3-numpy
 RUN apt install -y libgsl-dev libhdf5-dev
 
 RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr"), dependencies=TRUE)'
-RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "glmGamPoi", "GLAD"), ask=FALSE)'
+RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "glmGamPoi", "GLAD", "MAST"), ask=FALSE)'
 RUN Rscript -e 'install.packages("Seurat")'
 RUN Rscript -e 'install.packages("leiden")'
 RUN Rscript -e 'install.packages("Rfast2")'
