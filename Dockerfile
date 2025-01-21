@@ -11,3 +11,5 @@ RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr"), dependen
 RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "glmGamPoi", "GLAD"), ask=FALSE)'
 RUN Rscript -e 'install.packages("Seurat")'
 RUN Rscript -e 'install.packages("leiden")'
+RUN Rscript -e 'install.packages("Rfast2")'
+
