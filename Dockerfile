@@ -10,3 +10,4 @@ RUN apt install -y python3-leidenalg
 RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr"), dependencies=TRUE)'
 RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "glmGamPoi", "GLAD"), ask=FALSE)'
 RUN Rscript -e 'install.packages("Seurat")'
+RUN Rscript -e 'install.packages("leiden")'
