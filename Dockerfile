@@ -7,6 +7,6 @@ RUN apt-get update -y && \
             cmake libxml2-dev python3 python3-pip
 RUN apt install -y python3-leidenalg
 
-RUN Rscript -e 'install.packages(c("BiocManager", "Seurat", "ggrepel", "ggpubr"), \
-                    dependencies=TRUE, repos="https://cloud.r-project.org")'
+RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr"), dependencies=TRUE)'
 RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "glmGamPoi", "GLAD"), ask=FALSE)'
+RUN Rscript -e 'install.packages("Seurat")'
