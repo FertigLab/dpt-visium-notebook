@@ -12,5 +12,6 @@ RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "g
 RUN Rscript -e 'install.packages("Seurat")'
 RUN Rscript -e 'install.packages("leiden")'
 RUN Rscript -e 'install.packages("Rfast2")'
+RUN Rscript -e `install.packages("hdf5r")'
 RUN apt install -y libgsl-dev
 
