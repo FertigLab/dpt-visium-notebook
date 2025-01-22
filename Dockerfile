@@ -3,6 +3,15 @@ FROM rocker/r-ver:4
 #requirements to be able to render Rmarkdown files as adopted from 
 #https://library.virginia.edu/data/articles/how-to-use-docker-for-study-reproducibility-with-r-markdown
 RUN apt-get update && apt-get upgrade && apt-get install -y --no-install-recommends \
+        openssl-dev \
+        libblas-dev \
+        liblapack-dev \ 
+        gfortran \
+        libnlopt-dev \
+        cmake \
+        libxml2-dev \
+        libgsl-dev \
+        libhdf5-dev \
         wget \ 
         graphviz \ 
         texlive-latex-extra \ 
@@ -10,19 +19,6 @@ RUN apt-get update && apt-get upgrade && apt-get install -y --no-install-recomme
         perl && \ 
         /rocker_scripts/install_pandoc.sh && \
         install2.r rmarkdown
-
-# #probably more than exhaustive list of dependencies for the R packages
-# RUN apt-get install -y \
-#         openssl-dev \
-#         libblas-dev \
-#         liblapack-dev \ 
-#         gfortran \
-#         libnlopt-dev \
-#         cmake \
-#         libxml2-dev \
-#         libgsl-dev \
-#         libhdf5-dev \
-
 
 # #python packages to use leiden algorithm in Seurat
 # RUN apt install -y python3 python3-pip
