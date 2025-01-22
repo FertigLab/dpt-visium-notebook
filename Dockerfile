@@ -1,18 +1,35 @@
 FROM rocker/r-ver:4
 
-RUN apt-get update -y && \
-    apt-get upgrade -y && \
-    apt-get install -y libcurl4-openssl-dev libblas-dev \
-            liblapack-dev gfortran pandoc libnlopt-dev \
-            cmake libxml2-dev python3 python3-pip
-RUN apt install -y python3-leidenalg python3-numpy
-RUN apt install -y libgsl-dev libhdf5-dev
+#requirements to be able to render Rmarkdown files as adopted from 
+#https://library.virginia.edu/data/articles/how-to-use-docker-for-study-reproducibility-with-r-markdown
+RUN apg-get update && apt-get install -y --no-install-recommends \
+        wget \ 
+        graphviz \ 
+        texlive-latex-extra \ 
+        lmodern \ 
+        perl && \ 
+        /rocker_scripts/install_pandoc.sh && \
+        install2.r rmarkdown
 
-RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr"), dependencies=TRUE)'
+#probably more than exhaustive list of dependencies for the R packages
+RUN apt-get install -y \
+        libcurl4-openssl-dev \
+        libblas-dev \
+        liblapack-dev \ 
+        gfortran \
+        libnlopt-dev \
+        cmake \
+        libxml2-dev \
+        libgsl-dev \
+        libhdf5-dev \
+        python3 \
+        python3-pip
+
+#python packages to use leiden algorithm in Seurat
+RUN apt-get install -y python3-leidenalg python3-numpy
+
+#cran and bioconductor packages
+RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr", "Seurat", "leiden", "Rfast2", "hdf5r"), dependencies=TRUE)'
 RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "glmGamPoi", "GLAD", "MAST"), ask=FALSE)'
-RUN Rscript -e 'install.packages("Seurat")'
-RUN Rscript -e 'install.packages("leiden")'
-RUN Rscript -e 'install.packages("Rfast2")'
-RUN Rscript -e 'install.packages("hdf5r")'
 
 
