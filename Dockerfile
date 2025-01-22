@@ -32,4 +32,3 @@ RUN apt-get install -y python3-leidenalg python3-numpy
 RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr", "Seurat", "leiden", "Rfast2", "hdf5r"), dependencies=TRUE)'
 RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "glmGamPoi", "GLAD", "MAST"), ask=FALSE)'
 
-
