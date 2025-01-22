@@ -2,7 +2,7 @@ FROM rocker/r-ver:4
 
 #requirements to be able to render Rmarkdown files as adopted from 
 #https://library.virginia.edu/data/articles/how-to-use-docker-for-study-reproducibility-with-r-markdown
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade && apt-get install -y --no-install-recommends \
         wget \ 
         graphviz \ 
         texlive-latex-extra \ 
