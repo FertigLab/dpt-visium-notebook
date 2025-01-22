@@ -9,26 +9,26 @@ RUN apt-get update && apt-get upgrade && apt-get install -y --no-install-recomme
         lmodern \ 
         perl && \ 
         /rocker_scripts/install_pandoc.sh && \
-        install2.r rmarkdown \
+        install2.r rmarkdown
 
-#probably more than exhaustive list of dependencies for the R packages
-RUN apt-get install -y \
-        openssl-dev \
-        libblas-dev \
-        liblapack-dev \ 
-        gfortran \
-        libnlopt-dev \
-        cmake \
-        libxml2-dev \
-        libgsl-dev \
-        libhdf5-dev \
+# #probably more than exhaustive list of dependencies for the R packages
+# RUN apt-get install -y \
+#         openssl-dev \
+#         libblas-dev \
+#         liblapack-dev \ 
+#         gfortran \
+#         libnlopt-dev \
+#         cmake \
+#         libxml2-dev \
+#         libgsl-dev \
+#         libhdf5-dev \
 
 
-#python packages to use leiden algorithm in Seurat
-RUN apt install -y python3 python3-pip
-RUN apt install -y python3-leidenalg python3-numpy
+# #python packages to use leiden algorithm in Seurat
+# RUN apt install -y python3 python3-pip
+# RUN apt install -y python3-leidenalg python3-numpy
 
-#cran and bioconductor packages
-RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr", "Seurat", "leiden", "Rfast2", "hdf5r"), dependencies=TRUE)'
-RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "glmGamPoi", "GLAD", "MAST"), ask=FALSE)'
+# #cran and bioconductor packages
+# RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr", "Seurat", "leiden", "Rfast2", "hdf5r"), dependencies=TRUE)'
+# RUN Rscript -e 'BiocManager::install(c("fgsea", "EnhancedVolcano", "msigdbr", "glmGamPoi", "GLAD", "MAST"), ask=FALSE)'
 
