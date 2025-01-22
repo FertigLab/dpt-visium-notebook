@@ -25,7 +25,7 @@ RUN apt-get install -y \
 
 
 #python packages to use leiden algorithm in Seurat
-RUN apt install python3 python3-pip
+RUN apt install -y python3 python3-pip
 RUN apt install -y python3-leidenalg python3-numpy
 
 #cran and bioconductor packages
