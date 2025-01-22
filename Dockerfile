@@ -21,7 +21,7 @@ RUN apt-get update && apt-get upgrade && apt-get install -y --no-install-recomme
         install2.r rmarkdown
 
 # #python packages to use leiden algorithm in Seurat
-# RUN apt install -y python3 python3-leidenalg python3-numpy
+RUN apt update && install -y python3-leidenalg python3-numpy
 
 # #cran and bioconductor packages
 RUN Rscript -e 'install.packages(c("BiocManager", "ggrepel", "ggpubr", "Seurat", "leiden", "Rfast2", "hdf5r"), dependencies=TRUE)'
