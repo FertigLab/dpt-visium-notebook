@@ -9,6 +9,7 @@ RUN apt-get update && apt-get upgrade && apt-get install -y --no-install-recomme
         gfortran \
         libnlopt-dev \
         cmake \
+        patch \
         libxml2-dev \
         libgsl-dev \
         libhdf5-dev \
