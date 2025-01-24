@@ -8,6 +8,7 @@ process RENDER_RMD {
         path(notebook)
     output:
         tuple val(meta), path("*.html"), emit: notebook
+        path("versions.yml")             emit: versions
 
     script:
     def nb_file = notebook.simpleName
