@@ -7,8 +7,7 @@ process RENDER_RMD {
         tuple val(meta), path(data), path(coda)
         path(notebook)
     output:
-        tuple val(meta), path("${prefix}/${nb_file}.html"), emit: notebook
-        path "versions.yml"                             , emit: versions
+        tuple val(meta), path("*.html"), emit: notebook
 
     script:
     def nb_file = notebook.simpleName
@@ -18,10 +17,13 @@ process RENDER_RMD {
     dir.create("${prefix}", showWarnings = FALSE, recursive = TRUE)
     par <- list(spaceranger_dir="${data}",coda_ann_path="${coda}")
     outfile <- "${prefix}/${nb_file}.html"
-    rmarkdown::render("${notebook}", output_file=outfile, params=par)
-    sinfo <- sessionInfo()
+    rmarkdown::render(input="${notebook}", params=par)
+
+    #grab sessionInfo and write write versions.yml
+    message("reading session info")
+    sinfo <- readRDS("sessionInfo.rds")
     versions <- lapply(sinfo[["otherPkgs"]], function(x) {sprintf("  %s:%s",x[["Package"]],x[["Version"]])})
     cat("${task.process}",":\n", file="versions.yml", sep="")
-    cat(unlist(versions), file="versions.yml", append=TRUE, sep="\n")'
+    cat(unlist(versions), file="versions.yml", append=TRUE, sep="\n")
     """
 }
