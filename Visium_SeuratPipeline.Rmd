@@ -4,7 +4,6 @@ author: "LTKAGOHARA"
 date: "2024-12-04"
 output:
   html_document: default
-  pdf_document: default
 params:
   spaceranger_dir: "~/OneDrive/BTC_DPTpilot1_spaceranger/BTC"
   coda_ann_path: "~/OneDrive/CODA/H13/tissue_positions_cellular_compositions.csv"
@@ -16,7 +15,7 @@ params:
 # Incorporating CODA for cell type annotations
 
 ##### Loading packages
-```{r}
+```{r, echo=FALSE}
 library(Seurat)
 library(ggplot2)
 library(leiden)
@@ -31,6 +30,7 @@ library(msigdbr)
 library(RColorBrewer)
 library(ggpubr)
 library(MAST)
+saveRDS(sessionInfo(), "sessionInfo.rds")
 ```
 
 ## Increasing the allowed memory to avoid errors regarding lack of memory
@@ -171,7 +171,7 @@ ggsave("BTC_cluster_highlights_res08.png")
 ```
 
 ##### saving reduced data
-```{R}
+```{r}
 save(BTC, file = "BTC_clustered.Rda")
 ```
 
@@ -430,9 +430,3 @@ for (pathway in names(hallmark_list)) {
   }
 }
 ```
-
-## Incorporating the epithelial and CAF module scores into the complete Seurat object
-```{r}
-
-```
-
