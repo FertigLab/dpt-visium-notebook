@@ -1,14 +1,13 @@
 ---
-title: "BTC CytAssist Pilot"
-author: "LTKAGOHARA"
-date: "2024-12-04"
+title: "CytAssist Pilot"
+date: "2025-03-05"
 output:
   html_document: default
 params:
-  spaceranger_dir: "~/OneDrive/BTC_DPTpilot1_spaceranger/BTC"
-  coda_ann_path: "~/OneDrive/CODA/H13/tissue_positions_cellular_compositions.csv"
+  spaceranger_dir: null
+  coda_ann_path: null
   output_dir: "analysis_pilot"
-  sample_name: "BTC"
+  sample_name: "SMP"
 ---
 
 # VISIUM DATA ANALYSIS WITH SEURAT
@@ -38,210 +37,210 @@ saveRDS(sessionInfo(), "sessionInfo.rds")
 options(future.globals.maxSize = 1024 * 1024 * 1024)  # 1 GB
 ```
 
-## Loading the data for sample BTC
+## Loading the data for sample SMP
 ```{r}
-BTC <- Load10X_Spatial(params$spaceranger_dir)
-dim(BTC)
-head(BTC@meta.data)
+SMP <- Load10X_Spatial(params$spaceranger_dir)
+dim(SMP)
+head(SMP@meta.data)
 ```
 
 ## INTEGRATING CODA CELL CLASSIFICATION INTO METADATA
 ```{r}
-# extract BTC metadata
-BTCmetadata <- BTC@meta.data
+# extract SMP metadata
+SMPmetadata <- SMP@meta.data
 
 # uploading CODA annotations
-codaBTC <- as.data.frame(read.csv(params$coda_ann_path))
-rownames(codaBTC) <- codaBTC$X
-codaBTC <- codaBTC[, -c(1, 2, 3, 4, 5, 6)]
-head(codaBTC)
+codaSMP <- as.data.frame(read.csv(params$coda_ann_path))
+rownames(codaSMP) <- codaSMP$X
+codaSMP <- codaSMP[, -c(1, 2, 3, 4, 5, 6)]
+head(codaSMP)
 
 # merging CODA annotations to metadata
-BTCmetadata <- merge(BTCmetadata, codaBTC, by = "row.names")
+SMPmetadata <- merge(SMPmetadata, codaSMP, by = "row.names")
 
 # assigning cell types from CODA quantifications per spot (barcode)
-BTCmetadata$CODA <- "mixed"
-BTCmetadata$CODA[BTCmetadata$RespondingPDAC > 51] <- "responding"
-BTCmetadata$CODA[BTCmetadata$NonrespondingPDAC > 51] <- "non-responding"
-BTCmetadata$CODA[BTCmetadata$Stroma > 51] <- "stroma"
-BTCmetadata$CODA[BTCmetadata$Immune > 51] <- "immune"
-BTCmetadata$CODA[BTCmetadata$Vasculature > 51] <- "vasculature"
-BTCmetadata$CODA[BTCmetadata$Fat > 51] <- "fat"
-BTCmetadata$CODA[BTCmetadata$Acini > 51] <- "acini"
-BTCmetadata$CODA[BTCmetadata$Islets > 51] <- "islets"
-BTCmetadata$CODA[BTCmetadata$Nerve > 51] <- "nerve"
-BTCmetadata$CODA[BTCmetadata$Duct > 51] <- "normal duct"
-BTCmetadata$CODA[BTCmetadata$RespondingPDAC == 0 & 
-                 BTCmetadata$NonrespondingPDAC == 0 & 
-                 BTCmetadata$Stroma == 0 & 
-                 BTCmetadata$Immune == 0 &
-                 BTCmetadata$Vasculature == 0 &
-                 BTCmetadata$Fat == 0 &
-                 BTCmetadata$Acini == 0 &
-                 BTCmetadata$Islets == 0 &
-                 BTCmetadata$Nerve == 0 &
-                 BTCmetadata$Duct == 0] <- "NA"
-table(BTCmetadata$CODA)
+SMPmetadata$CODA <- "mixed"
+SMPmetadata$CODA[SMPmetadata$RespondingPDAC > 51] <- "responding"
+SMPmetadata$CODA[SMPmetadata$NonrespondingPDAC > 51] <- "non-responding"
+SMPmetadata$CODA[SMPmetadata$Stroma > 51] <- "stroma"
+SMPmetadata$CODA[SMPmetadata$Immune > 51] <- "immune"
+SMPmetadata$CODA[SMPmetadata$Vasculature > 51] <- "vasculature"
+SMPmetadata$CODA[SMPmetadata$Fat > 51] <- "fat"
+SMPmetadata$CODA[SMPmetadata$Acini > 51] <- "acini"
+SMPmetadata$CODA[SMPmetadata$Islets > 51] <- "islets"
+SMPmetadata$CODA[SMPmetadata$Nerve > 51] <- "nerve"
+SMPmetadata$CODA[SMPmetadata$Duct > 51] <- "normal duct"
+SMPmetadata$CODA[SMPmetadata$RespondingPDAC == 0 & 
+                 SMPmetadata$NonrespondingPDAC == 0 & 
+                 SMPmetadata$Stroma == 0 & 
+                 SMPmetadata$Immune == 0 &
+                 SMPmetadata$Vasculature == 0 &
+                 SMPmetadata$Fat == 0 &
+                 SMPmetadata$Acini == 0 &
+                 SMPmetadata$Islets == 0 &
+                 SMPmetadata$Nerve == 0 &
+                 SMPmetadata$Duct == 0] <- "NA"
+table(SMPmetadata$CODA)
 
-BTC <- AddMetaData(object = BTC, metadata = BTCmetadata)
-head(BTC)
+SMP <- AddMetaData(object = SMP, metadata = SMPmetadata)
+head(SMP)
 ```
 
 ##### saving object with CODA classification
 ```{r}
-save(BTC, file = "BTC_CODA.Rda")
+save(SMP, file = "SMP_CODA.Rda")
 ```
 
 # DATA PREPROCESSING
 
 ## QC and filtering
 ```{r}
-load("BTC_CODA.Rda")
+load("SMP_CODA.Rda")
 
 # proportion of mitochondrial reads
-BTC[["percent_mt"]] <- PercentageFeatureSet(BTC, pattern = "^MT-")
-head(BTC@meta.data)
+SMP[["percent_mt"]] <- PercentageFeatureSet(SMP, pattern = "^MT-")
+head(SMP@meta.data)
 
-VlnPlot(BTC, features = c("nFeature_Spatial", "nCount_Spatial", "percent_mt"), ncol = 3)
-ggsave("BTC_QC1.png")
+VlnPlot(SMP, features = c("nFeature_Spatial", "nCount_Spatial", "percent_mt"), ncol = 3)
+ggsave("SMP_QC1.png")
 
-plot1 <- FeatureScatter(BTC, feature1 = "nCount_Spatial", feature2 = "percent_mt")
-plot2 <- FeatureScatter(BTC, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
+plot1 <- FeatureScatter(SMP, feature1 = "nCount_Spatial", feature2 = "percent_mt")
+plot2 <- FeatureScatter(SMP, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial")
 wrap_plots(plot1, plot2)
-ggsave("BTC_QC2.png")
+ggsave("SMP_QC2.png")
 
 # plots to verify the variance in counts across spots
-plot3 <- VlnPlot(BTC, features = "nCount_Spatial", pt.size = 0.1) + NoLegend()
-plot4 <- SpatialFeaturePlot(BTC, features = "nCount_Spatial", pt.size.factor = 7) + theme(legend.position = "right")
+plot3 <- VlnPlot(SMP, features = "nCount_Spatial", pt.size = 0.1) + NoLegend()
+plot4 <- SpatialFeaturePlot(SMP, features = "nCount_Spatial", pt.size.factor = 7) + theme(legend.position = "right")
 wrap_plots(plot3, plot4)
-ggsave("BTC_QC3.png")
+ggsave("SMP_QC3.png")
 
 # NOTE: data looks good quality and spots were not filtered out of the analysis
 ```
 
 ##### saving filtered dataset
 ```{r}
-save(BTC, file = "BTC_filtered.Rda")
+save(SMP, file = "SMP_filtered.Rda")
 ```
 
 ## NORMALIZATION WITH SCTransform
 ```{r}
-load("BTC_filtered.Rda")
+load("SMP_filtered.Rda")
 
-BTC <- SCTransform(BTC, assay = "Spatial", vars.to.regress = "percent_mt",verbose = F)
+SMP <- SCTransform(SMP, assay = "Spatial", vars.to.regress = "percent_mt",verbose = F)
 ```
 
 ##### saving SCTransformed data
 ```{r}
-save(BTC, file = "BTC_SCTransformed.Rda")
+save(SMP, file = "SMP_SCTransformed.Rda")
 ```
 
 ## DIMENSIONALITY REDUCTION, CLUSTERING, VISUALIZATION
 ```{r}
-load("BTC_SCTransformed.Rda")
+load("SMP_SCTransformed.Rda")
 
-BTC <- RunPCA(BTC, assay = "SCT")
-DimPlot(BTC, reduction = "pca")
+SMP <- RunPCA(SMP, assay = "SCT")
+DimPlot(SMP, reduction = "pca")
 
 # cluster spots
-BTC <- FindNeighbors(BTC, reduction = "pca", dims = 1:30)
-BTC <- FindClusters(BTC, algorithm = 4)
+SMP <- FindNeighbors(SMP, reduction = "pca", dims = 1:30)
+SMP <- FindClusters(SMP, algorithm = 4)
 
 # run UMAP for dimensional reduction
-BTC <- RunUMAP(BTC, reduction = "pca", dims = 1:30)
+SMP <- RunUMAP(SMP, reduction = "pca", dims = 1:30)
 
 # creating a palette of colors that fits 15 clusters
-colorcount <- length(unique(BTC$SCT_snn_res.0.8))
+colorcount <- length(unique(SMP$SCT_snn_res.0.8))
 myPalette <- colorRampPalette(brewer.pal(12, "Paired"))
 
-DimPlot(BTC, reduction = "umap", label = TRUE)
-ggsave("BTC_Dimplot.png")
-SpatialDimPlot(BTC, label = T, label.size = 2.5, pt.size.factor = 7) + 
+DimPlot(SMP, reduction = "umap", label = TRUE)
+ggsave("SMP_Dimplot.png")
+SpatialDimPlot(SMP, label = T, label.size = 2.5, pt.size.factor = 7) + 
   scale_fill_manual(values = myPalette(colorcount))
-ggsave("BTC_clustering_res08.png")
+ggsave("SMP_clustering_res08.png")
 
 # highligthing specific clusters (cluster by cluster plot)
 # all clusters
-SpatialDimPlot(BTC, 
-               cells.highlight = CellsByIdentities(object = BTC,idents = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
+SpatialDimPlot(SMP, 
+               cells.highlight = CellsByIdentities(object = SMP,idents = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
                                                                              11, 12, 13, 14, 15, 16, 17)),
                facet.highlight = T, ncol = 6, pt.size.factor = 7, image.alpha = 1, alpha = 0.5)
 
-ggsave("BTC_cluster_highlights_res08.png")
+ggsave("SMP_cluster_highlights_res08.png")
 ```
 
 ##### saving reduced data
 ```{r}
-save(BTC, file = "BTC_clustered.Rda")
+save(SMP, file = "SMP_clustered.Rda")
 ```
 
 ## FINDING CLUSTER MARKER GENES
 ```{r}
-load("BTC_clustered.Rda")
+load("SMP_clustered.Rda")
 
 ### find all markers in each cluster distinguishing one cluster from all other spots
-markers_BTC <- FindAllMarkers(BTC, test.use = "MAST",only.pos = T, min.pct = 0.25, logfc.threshold = 0.25)
-markers_df <- as.data.frame(markers_BTC %>% group_by(cluster) %>% slice_max(n = 10, order_by = avg_log2FC))
-DoHeatmap(BTC,features = markers_df$gene)
-ggsave("BTC_markersHM.png")
+markers_SMP <- FindAllMarkers(SMP, test.use = "MAST",only.pos = T, min.pct = 0.25, logfc.threshold = 0.25)
+markers_df <- as.data.frame(markers_SMP %>% group_by(cluster) %>% slice_max(n = 10, order_by = avg_log2FC))
+DoHeatmap(SMP,features = markers_df$gene)
+ggsave("SMP_markersHM.png")
 ```
 
 ## INDENTIFYING HIGHLY VARIABLE SPATIAL FEATURES
 ```{r}
 # FindSpatiallyVariables search for features without pre-annotation
 # "markvariogram" finds genes whose expression depends on spatial location
-BTC <- FindVariableFeatures(BTC, selection.method = "vst", nfeatures = 2000)
-topBTC_varfeat <- head(VariableFeatures(BTC), 10)
-topBTC_varfeat
+SMP <- FindVariableFeatures(SMP, selection.method = "vst", nfeatures = 2000)
+topSMP_varfeat <- head(VariableFeatures(SMP), 10)
+topSMP_varfeat
 
-BTC <- FindSpatiallyVariableFeatures(BTC, assay = "SCT", 
-                                     features = VariableFeatures(BTC)[1:2000], 
+SMP <- FindSpatiallyVariableFeatures(SMP, assay = "SCT", 
+                                     features = VariableFeatures(SMP)[1:2000], 
                                      selection.method = "moransi")
-top_features <- head(VariableFeatures(BTC, method = "moransi"), 20)
-SpatialFeaturePlot(BTC, features = top_features, ncol = 5, alpha = c(0.1,1))
-ggsave("BTC_varfeatures.png")
+top_features <- head(VariableFeatures(SMP, method = "moransi"), 20)
+SpatialFeaturePlot(SMP, features = top_features, ncol = 5, alpha = c(0.1,1))
+ggsave("SMP_varfeatures.png")
 ```
 
 ##### saving variable features data
 ```{r}
-save(BTC, file = "BTC_VarFeatures.Rda")
+save(SMP, file = "SMP_VarFeatures.Rda")
 ```
 
 ## SETTING CODA AS ACTIVE IDENTITIES
 ```{r}
-load("BTC_VarFeatures.Rda")
+load("SMP_VarFeatures.Rda")
 
 # making CODA annotations the active identities
-Idents(BTC) <- "CODA"
-table(Idents(BTC))
+Idents(SMP) <- "CODA"
+table(Idents(SMP))
 
-SpatialDimPlot(BTC, label = T, label.size = 2.5, pt.size.factor = 5, cols = "Paired")
-ggsave("BTC_clustering_CODA.png")
+SpatialDimPlot(SMP, label = T, label.size = 2.5, pt.size.factor = 5, cols = "Paired")
+ggsave("SMP_clustering_CODA.png")
 
-SpatialDimPlot(BTC, 
-               cells.highlight = CellsByIdentities(object = BTC,idents = c("responding", "non-responding", "stroma", 
+SpatialDimPlot(SMP, 
+               cells.highlight = CellsByIdentities(object = SMP,idents = c("responding", "non-responding", "stroma", 
                                                                              "immune", "vasculature",  "fat", "acini", 
                                                                              "islets", "nerve", "normal duct", "mixed")),
                facet.highlight = T, ncol = 6, pt.size.factor = 7, image.alpha = 1, alpha = 0.5)
 
-ggsave("BTC_cluster_highlights_CODA.png")
+ggsave("SMP_cluster_highlights_CODA.png")
 
-markers_BTC <- FindAllMarkers(BTC, test.use = "MAST",only.pos = T, min.pct = 0.25, logfc.threshold = 0.25)
-codamarkers_df <- as.data.frame(markers_BTC %>% group_by(cluster) %>% slice_max(n = 10, order_by = avg_log2FC))
-DoHeatmap(BTC,features = codamarkers_df$gene)
-ggsave("BTC_markersHM_CODA.png")
+markers_SMP <- FindAllMarkers(SMP, test.use = "MAST",only.pos = T, min.pct = 0.25, logfc.threshold = 0.25)
+codamarkers_df <- as.data.frame(markers_SMP %>% group_by(cluster) %>% slice_max(n = 10, order_by = avg_log2FC))
+DoHeatmap(SMP,features = codamarkers_df$gene)
+ggsave("SMP_markersHM_CODA.png")
 ```
 
 ##### saving the object using the CODA annotations as active idents
 ```{r}
-save(BTC, file = "BTC_CODAidents.Rda")
+save(SMP, file = "SMP_CODAidents.Rda")
 ```
 
 ## Differential expression analysis with CODA annotations
 ```{r}
-load("BTC_CODAidents.Rda")
+load("SMP_CODAidents.Rda")
 
-DGEA <- FindMarkers(BTC, test.use = "MAST", ident.1 = "responding", ident.2 = "non-responding", logfc.treshold = 0.1, min.pct = 0.1)
+DGEA <- FindMarkers(SMP, test.use = "MAST", ident.1 = "responding", ident.2 = "non-responding", logfc.treshold = 0.1, min.pct = 0.1)
 dgea_df <- as.data.frame(DGEA)
 
 top_genes <- rownames(DGEA)[order(DGEA$p_val_adj)][1:10]
@@ -257,8 +256,8 @@ EnhancedVolcano(dgea_df,
                 xlim = c(-1.5, 1.5), 
                 ylim = c(0, 5), 
                 labSize = 4.0)
-ggsave("BTC_DGEA_volcano.png")
-write.csv(dgea_df, file = "BTC_DGEA_output.csv")
+ggsave("SMP_DGEA_volcano.png")
+write.csv(dgea_df, file = "SMP_DGEA_output.csv")
 
 # GSEA
 # ranking genes
@@ -286,7 +285,7 @@ fgseaRes <- fgseaMultilevel(pathways = hs_list,
                             nPermSimple = 10000, 
                             nproc = 1)
 head(fgseaRes)
-save(fgseaRes, file = "BTC_fgsea_hallmarks.Rda")
+save(fgseaRes, file = "SMP_fgsea_hallmarks.Rda")
 
 ggplot(fgseaRes, aes(reorder(pathway, NES), NES)) +
   geom_col(aes(fill=pval<0.05)) +
@@ -294,7 +293,7 @@ ggplot(fgseaRes, aes(reorder(pathway, NES), NES)) +
   labs(x="Pathway", y="Normalized Enrichment Score",
        title="Hallmark pathways NES from GSEA") + 
   theme_minimal()
-ggsave("BTC_GSEA_NES_waterfall.png")
+ggsave("SMP_GSEA_NES_waterfall.png")
 ```
 
 
@@ -302,77 +301,77 @@ ggsave("BTC_GSEA_NES_waterfall.png")
 ```{r}
 ### AddModuleScore for PDAC subtypes (Moffitt classification - classical and basal-like)
 
-load("BTC_CODAidents.Rda")
+load("SMP_CODAidents.Rda")
 
 # subsetting for epithelial cells
-BTCepit <- subset(BTC, idents = c("responding", "non-responding", "normal duct"))
-SpatialDimPlot(BTCepit, label = T, label.size = 2.5, pt.size.factor = 5, cols = "Paired")
+SMPepit <- subset(SMP, idents = c("responding", "non-responding", "normal duct"))
+SpatialDimPlot(SMPepit, label = T, label.size = 2.5, pt.size.factor = 5, cols = "Paired")
 
-save(BTCepit, file = "BTC_Epithelial.Rda")
+save(SMPepit, file = "SMP_Epithelial.Rda")
 
 # PDAC basal subtype
 basal_genes <- list(c('VGLL','UCA1','S100A2','LY6D','SPRR3','SPRR1B','LEMD1','KRT15',
                       'CTSL2','DHRS9','AREG','CST6','SERPINB3','KRT6C','KRT6A','SERPINB4',
                       'FAM83A','SCEL','FGFBP1','KRT7','KRT17','GPR87','TNS4','SLC2A1',
                       'ANXA8L2'))
-BTCepit <- AddModuleScore(BTCepit, features = basal_genes, name = 'basal')
-SpatialFeaturePlot(BTCepit, features = 'basal1', images = 'slice1', pt.size.factor = 5)
-ggsave("BTC_basal.png")
+SMPepit <- AddModuleScore(SMPepit, features = basal_genes, name = 'basal')
+SpatialFeaturePlot(SMPepit, features = 'basal1', images = 'slice1', pt.size.factor = 5)
+ggsave("SMP_basal.png")
 
-VlnPlot(BTCepit, features = 'basal1')
-ggsave("BTC_basal_vln.png")
+VlnPlot(SMPepit, features = 'basal1')
+ggsave("SMP_basal_vln.png")
 
 # PDAC classical subtype
 classical_genes <- list(c('BTNL8','FAM3D','ATAD4','AGR3','CTSE','LOC400573','LYZ','TFF2',
                           'TFF1','ANXA10','LGALS4','PLA2G10','CEACAM6','VSIG2','TSPAN8',
                           'ST6GALNAC1','AGR2','TFF3','CYP3A7','MYO1A','CLRN3','KRT20',
                           'CDH17','SPINK4','REG4'))
-BTCepit <- AddModuleScore(BTCepit, features = classical_genes, name = 'classical')
-SpatialFeaturePlot(BTCepit, features = 'classical1', images = 'slice1', pt.size.factor = 5)
-ggsave("BTC_classical.png")
+SMPepit <- AddModuleScore(SMPepit, features = classical_genes, name = 'classical')
+SpatialFeaturePlot(SMPepit, features = 'classical1', images = 'slice1', pt.size.factor = 5)
+ggsave("SMP_classical.png")
 
-VlnPlot(BTCepit, features = 'classical1')
-ggsave("BTC_classical_vln.png")
+VlnPlot(SMPepit, features = 'classical1')
+ggsave("SMP_classical_vln.png")
 ```
 
 ## Identifying CAF subtypes
 ```{r}
 ### AddModuleScore for CAF subtypes
 
-load("BTC_CODAidents.Rda")
+load("SMP_CODAidents.Rda")
 
 # subsetting for stroma
-BTCstroma <- subset(BTC, idents = "stroma")
-save(BTCstroma, file = "BTC_Stroma.Rda")
+SMPstroma <- subset(SMP, idents = "stroma")
+save(SMPstroma, file = "SMP_Stroma.Rda")
 
 # panCAFs
 pancaf_genes <- list(c('LUM','DCN','COL1A1','VIM','CD39','FSP1','FAP','ACTA2','PDPN'))
-BTCstroma <- AddModuleScore(BTCstroma, features = pancaf_genes, name = 'panCAF')
-SpatialFeaturePlot(BTCstroma, features = 'panCAF1', images = 'slice1', pt.size.factor = 5)
-ggsave("BTC_panCAF.png")
+SMPstroma <- AddModuleScore(SMPstroma, features = pancaf_genes, name = 'panCAF')
+SpatialFeaturePlot(SMPstroma, features = 'panCAF1', images = 'slice1', pt.size.factor = 5)
+ggsave("SMP_panCAF.png")
 
 # iCAFs
 iCAF_genes <- list(c('CXCL1','CXCL2','CCL2','CXCL12','PDGFRA','CFD','LMNA','DPT','HAS1','HAS2'))
-BTCstroma <- AddModuleScore(BTCstroma, features = iCAF_genes, name = 'iCAF')
-SpatialFeaturePlot(BTCstroma, features = 'iCAF1', images = 'slice1', pt.size.factor = 5)
-ggsave("BTC_iCAF.png")
+SMPstroma <- AddModuleScore(SMPstroma, features = iCAF_genes, name = 'iCAF')
+SpatialFeaturePlot(SMPstroma, features = 'iCAF1', images = 'slice1', pt.size.factor = 5)
+ggsave("SMP_iCAF.png")
 
 # myCAFs
 myCAF_genes <- list(c('TAGLN','MYL9','TPM2','MMP11','POSTN','HOPX','TWIST1','SOX4'))
-BTCstroma <- AddModuleScore(BTCstroma, features = myCAF_genes, name = 'myCAF')
-SpatialFeaturePlot(BTCstroma, features = 'myCAF1', images = 'slice1', pt.size.factor = 5)
-ggsave("BTC_myCAF.png")
+SMPstroma <- AddModuleScore(SMPstroma, features = myCAF_genes, name = 'myCAF')
+SpatialFeaturePlot(SMPstroma, features = 'myCAF1', images = 'slice1', pt.size.factor = 5)
+ggsave("SMP_myCAF.png")
 
 # apCAFs
 apCAF_genes <- list(c('HLA-DRA','HLA-DPA1','CD74','HLA-DQ','SLPI'))
-BTCstroma <- AddModuleScore(BTCstroma, features = apCAF_genes, name = 'apCAF')
-SpatialFeaturePlot(BTCstroma, features = 'apCAF1', images = 'slice1', pt.size.factor = 5)
-ggsave("BTC_apCAF.png")
+SMPstroma <- AddModuleScore(SMPstroma, features = apCAF_genes, name = 'apCAF')
+SpatialFeaturePlot(SMPstroma, features = 'apCAF1', images = 'slice1', pt.size.factor = 5)
+ggsave("SMP_apCAF.png")
 ```
 
 ### Module score analysis for Hallmark Pathways for Epithelial (responding, non-responding, normal) Cells
 ```{r}
-load("BTC_Epithelial.Rda")
+load("SMP_Epithelial.Rda")
 
 # loading and create a list of MSigDB Hallmark pathways
 hallmark_pathways = msigdbr(species = "Homo sapiens", category = "H")
@@ -381,30 +380,30 @@ hallmark_list <- split(hallmark_pathways$gene_symbol, hallmark_pathways$gs_name)
 
 # loop for calculating module scores
 for (pathway in names(hallmark_list)) {
-  BTCepit <- AddModuleScore(
-    object = BTCepit,
+  SMPepit <- AddModuleScore(
+    object = SMPepit,
     features = list(hallmark_list[[pathway]]),
     name = pathway,
     ctrl = 5
   )
   
   # Plot the SpatialFeaturePlot
-    plot <- SpatialFeaturePlot(BTCepit, features = paste0(pathway, "1"))
+    plot <- SpatialFeaturePlot(SMPepit, features = paste0(pathway, "1"))
     print(plot)
   
   # Save the plot
     ggsave(filename = file.path(paste0(pathway, "_feature_plot.png")), plot = plot, width = 8, height = 6)
 }
 
-head(BTCepit@meta.data)
+head(SMPepit@meta.data)
 
-save(BTCepit, file = 'BTCepit_modscores.Rda')
+save(SMPepit, file = 'SMPepit_modscores.Rda')
 ```
 
 ### module scores violin plots
 ```{r}
 # subsetting data for violin plots
-epit_meta <- BTCepit@meta.data
+epit_meta <- SMPepit@meta.data
 
 # creating groups for statistical comparisons
 mycomparisons <- list(c('normal duct','responding'), c('normal duct','non-responding'), c('responding','non-responding'))
