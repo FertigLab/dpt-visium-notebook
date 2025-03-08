@@ -18,7 +18,7 @@ process RENDER_RMD {
     dir.create("${prefix}", showWarnings = FALSE, recursive = TRUE)
     par <- list(spaceranger_dir="${data}",coda_ann_path="${coda}")
     outfile <- "${prefix}/${nb_file}.html"
-    rmarkdown::render(input="${notebook}", params=par)
+    rmarkdown::render(input="${notebook}", params=par, output_file=outfile)
 
     #grab sessionInfo and write write versions.yml
     message("reading session info")
