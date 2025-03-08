@@ -7,7 +7,7 @@ process RENDER_RMD {
         tuple val(meta), path(data), path(coda)
         path(notebook)
     output:
-        tuple val(meta), path("*.html"), emit: notebook
+        tuple val(meta), path("${prefix}/${nb_file}.html"), emit: notebook
         path("versions.yml"),             emit: versions
 
     script:
