@@ -1,4 +1,4 @@
-process RENDER_RMD {
+process NOTEBOOK_RENDER {
     tag "$meta.id"
     label 'process_medium'
     container 'ghcr.io/fertiglab/dpt-visium-notebook:main'
